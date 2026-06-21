@@ -1,42 +1,42 @@
 import requests
 from bs4 import BeautifulSoup
+import csv
 
-
-def get_cars_data(car):
-    
-    url=f'https://www.pakwheels.com/new-cars/pricelist/{car}'
+def get_car_data(car):
+        
+   # car =input("Enter manufacturer name:")
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://google.com"
     }
-    response=requests.get(url, headers=headers)
 
-    cars=[]
-    if response.status_code==200:
+    url=f'https://www.pakwheels.com/new-cars/pricelist/{car}'
+
+    response=requests.get(url, headers=headers)
+    car=[]
+    if response.status_code == 200:
         soup=BeautifulSoup(response.text,'html.parser')
         tables=soup.find_all('table')
-        if not tables:
-            print("No tables found on the webpage.")
         for table in tables:
             rows=table.find_all('tr')
             for row in rows:
                 cols=row.find_all('td')
-                if len(cols)>= 2:
+                if len(cols)>=2:
                     name=cols[0].get_text()
                     price=cols[1].get_text()
-                    cars.append({'name': name, 'price': price})
-                  
-            
+                    car.append({'name': name, 'price': price})
     else:
-        print("Failed to retrieve the webpage.")    
+        print("Page not available !")
+
+    return car
         
-    return cars
 
+# function to save data on csv file
+def save_to_csv(data, filename):
 
-#create a function to scrape data from the webpage, the above code can be used inside the function
-def scrapper():
-    pass
+    with open(filename, mode='w', newline='', encoding='utf-8') as file:
+        writer = csv.DictWriter(file, fieldnames=['name', 'price'])
 
-
-# create a function to save data to a csv file
-def save_to_file(data, filename):
-    pass
+        writer.writeheader()
+        writer.writerows(data)
